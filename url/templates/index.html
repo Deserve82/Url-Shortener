@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Url Shortener</title>
+</head>
+<body>
+    Url을 입력해 주세요.
+    <form id="shortenUrl" method="post">
+        <label>
+            <input type="text" id="url" />
+        </label>
+        <input type="submit" value="Shorten">
+    </form>
+
+    <div id="currUrl" style="display: none">
+         <label for="currChangedUrl">최근 변경된 url : </label><input id="currChangedUrl" readonly/>
+        -> <a id="shortendUrl"><input type="text" id="test" /></a>
+    </div>
+</body>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+    $("#shortenUrl").submit( function () {
+        const url = $("#url").val();
+        if (typeof url == "undefined" || url == null || url === ""){
+            alert("url을 입력해 주세요.");
+        }
+        $.ajax({
+           url: '/shorten',
+           dataType: 'json',
+           type: 'POST',
+           data: {"url" : url},
+           success: function (result){
+               $("#currUrl").removeAttr("style");
+               $("#currChangedUrl").val(result.original_url);
+               $("#test").val(result.shortend_url);
+               $("#shortendUrl").href(result.shortend_url);
+           }
+        });
+        return false;
+    })
+</script>
+
+</html>
