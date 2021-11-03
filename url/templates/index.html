@@ -14,33 +14,44 @@
     </form>
 
     <div id="currUrl" style="display: none">
-         <label for="currChangedUrl">최근 변경된 url : </label><input id="currChangedUrl" readonly/>
-        -> <a id="shortendUrl"><input type="text" id="test" /></a>
+         최근 변경된 url : <a id="currChangedUrl" readonly></a>
+        -> <a id="shortendUrl"></a>
+
+        <br>
+        최근 이 주소로 방문된 횟수 : <a id="currentClicked"></a>
     </div>
 </body>
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
-    $("#shortenUrl").submit( function () {
-        const url = $("#url").val();
-        if (typeof url == "undefined" || url == null || url === ""){
-            alert("url을 입력해 주세요.");
-        }
-        $.ajax({
-           url: '/shorten',
-           dataType: 'json',
-           type: 'POST',
-           data: {"url" : url},
-           success: function (result){
-               $("#currUrl").removeAttr("style");
-               $("#currChangedUrl").val(result.original_url);
-               $("#test").val(result.shortend_url);
-               $("#shortendUrl").href(result.shortend_url);
-           }
-        });
-        return false;
-    })
+    $(document).ready(
+        $("#shortenUrl").submit( function () {
+            const url = $("#url").val();
+            if (typeof url == "undefined" || url == null || url === ""){
+                alert("url을 입력해 주세요.");
+                return false;
+            }
+            $.ajax({
+               url: '/shorten',
+               dataType: 'json',
+               type: 'POST',
+               data: {"url" : url},
+               success: function (result){
+                   if (result.result_code !== 0){
+                       alert(result.result_msg);
+                   } else {
+                       const data = result.data;
+                       $("#currUrl").removeAttr("style");
+                       $("#currentClicked").text(data.clicked_count);
+                       $("#currChangedUrl").text(data.original_url);
+                       $("#shortendUrl").text(data.shortend_url);
+                   }
+               }
+            });
+            return false;
+        })
+    );
 </script>
 
 </html>
