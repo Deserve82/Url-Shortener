@@ -9,24 +9,54 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import json
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.core.exceptions import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+try:
+    with open("./secrets.json") as sf:
+        secrets = json.loads(sf.read())
+    with open("./common_data.json") as cf:
+        common_data = json.loads(cf.read())
+except FileExistsError:
+    raise ImproperlyConfigured("No secrets.json file in base directory")
+
+
+def get_json_data(key, data):
+    try:
+        return data[key]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(key)
+        raise ImproperlyConfigured(error_msg)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ny#+=rhev%la(f_(p02@3zmvkajb$b+u1!3!i)(-na=mv*&6$u'
+SECRET_KEY = get_json_data("secret_key", secrets)
+
+# Url Schemes
+URL_SCHEMES = get_json_data("url_schemes", common_data)
+
+# Curr Domain
+CURRENT_DOMAIN = get_json_data("domain", common_data)
+
+# Curr Scheme
+CURRENT_SCHEME = get_json_data("scheme", common_data)
+
+# Valid Chars
+VALID_CHARS = get_json_data("chars", common_data)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -72,7 +102,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Url_shortener.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -82,7 +111,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -102,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -115,7 +142,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -131,4 +157,44 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ]
+}
+
+# logging
+LOGGING = {
+    'version': 1,
+    # 기존의 로깅 설정을 비활성화 할 것인가?
+    'disable_existing_loggers': False,
+
+    # 포맷터
+    # 로그 레코드는 최종적으로 텍스트로 표현됨
+    # 이 텍스트의 포맷 형식 정의
+    # 여러 포맷 정의 가능
+    'formatters': {
+        'format1': {
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S'
+        }
+    },
+
+    # 핸들러
+    # 로그 레코드로 무슨 작업을 할 것인지 정의
+    # 여러 핸들러 정의 가능
+    'handlers': {
+        # 콘솔(터미널)에 출력
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'format1',
+        }
+    },
+
+    # 로거
+    # 로그 레코드 저장소
+    # 로거를 이름별로 정의
+    'loggers': {
+        'url': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+        }
+    }
 }

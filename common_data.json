@@ -1,0 +1,6 @@
+{
+  "url_schemes": ["http", "https", "ftp", "aaa"],
+  "domain": "127.0.0.1:8000",
+  "scheme": "http",
+  "chars": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+}
