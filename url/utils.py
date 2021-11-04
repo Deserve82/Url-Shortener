@@ -33,12 +33,24 @@ def make_shorten_url():
 
 
 def make_url_scheme(url):
-    result = urlparse(url)
-    if result.scheme == "":
-        # scheme이 없거나 잘못 되었다면 default로 http를 넣어줍니다.
+    """
+    url에 scheme이 없다면 문자열로 붙여주는 함수입니다. 유효하지 않은 형식이라면 빈 문자열을 반환합니다.
+    :param: string
+    :return: string
+    """
+    result = url.split("://")
+    # scheme을 입력 받지 않았다면 http를 기본으로 붙여줍니다.
+    if len(result) == 1:
         url = "http://" + url
-    elif result.scheme not in settings.URL_SCHEMES:
-        url = "http://" + url.split("://")[1]
+
+    # scheme이 유효하지 않아도 http로 변경해서 넣어줍니다.
+    elif len(result) == 2:
+        if result[0] not in settings.URL_SCHEMES:
+            url = "http://" + result[1]
+
+    # 2개가 아니라면 유효하지 않음으로 빈 문자열을 반환합니다.
+    else:
+        url = ""
     return url
 
 
