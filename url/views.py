@@ -12,11 +12,22 @@ logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 def index(request):
+    """
+    메인페이지
+    :param request:
+    :return: redirection
+    """
     return render(request, 'index.html')
 
 
+# url입력 시 8자의 짧은 url주소를 반환합니다.
 @api_view(['POST'])
 def shorten_url(request):
+    """
+    url을 입력받고 줄여주는 8자의 문자를 덧붙인 주소를 전달하는 함수입니다.
+    :param request: {url : string}
+    :return: ResultModel, ResultModel.data에는 짧아진 url, 원래의 url, 클릭 되었던 횟수가 담겨있습니다.
+    """
     response = ResultModel()
     try:
         url = make_url_scheme(request.data["url"])
@@ -34,6 +45,7 @@ def shorten_url(request):
 
         serializer = UrlSerializer(url_object)
         response.data = serializer.data
+
     except Exception as e:
         response.result_code = -99
         response.result_msg = "잠시 후 다시 시도해주세요."
@@ -43,6 +55,12 @@ def shorten_url(request):
 
 @api_view(['GET'])
 def revert_url(request, url_key):
+    """
+    변환 받은 키를 입력받아 저장된 곳으로 이동시키는 함수입니다.
+    :param request:
+    :param url_key: 변환한 8자리 임의의 string
+    :return: redirection
+    """
     url = get_shorten_url(url_key)
     try:
         url_object = get_or_none(Url, shortend_url=url)
