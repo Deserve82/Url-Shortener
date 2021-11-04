@@ -3,27 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <title>Url Shortener</title>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <style>
+        body {
+            background: #19beda;
+        }
+        .shortener {
+            padding: 300px 0;
+            background: #19beda;
+        }
+
+        .shortener .content {
+            max-width: 650px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .shortener .content h2 {
+            color: #243c4f;
+            margin-bottom: 40px;
+        }
+
+        .shortener .content .form-control {
+            height: 50px;
+            width: 500px;
+            border-color: #ffffff;
+            border-radius:0;
+        }
+
+        .shortener .content.form-control:focus {
+            box-shadow: none;
+            border: 2px solid #243c4f;
+        }
+
+        .shortener .content .btn {
+            min-height: 50px;
+            margin-left: 5px;
+            border-radius:0;
+            background: #243c4f;
+            color: #fff;
+            font-weight:600;
+        }
+    </style>
+
 </head>
 <body>
-    Url을 입력해 주세요.
-    <form id="shortenUrl" method="post">
-        <label>
-            <input type="text" id="url" />
-        </label>
-        <input type="submit" value="Shorten">
-    </form>
-
-    <div id="currUrl" style="display: none">
-         최근 변경된 url : <a id="currChangedUrl" readonly></a>
-        -> <a id="shortendUrl"></a>
-
-        <br>
-        최근 이 주소로 방문된 횟수 : <a id="currentClicked"></a>
+<section class="shortener">
+    <div class="content">
+        <h2>Url을 입력해 주세요.</h2>
+            <form id="shortenUrl" method="post">
+                <div class="input-group">
+                    <label>
+                        <input class="form-control" type="text" id="url" placeholder="url주소를 입력해 주세요."/>
+                    </label>
+                    <span class="input-group-btn">
+                        <button class="btn" type="submit">변환 하기</button>
+                    </span>
+                </div>
+            </form>
+            <div id="currUrl" style="display: none">
+                 최근 url : <a id="currChangedUrl" readonly></a> -> <a id="shortendUrl"></a> <button onclick="copyUrl()">복사</button>
+                <br>
+                최근 이 주소로 방문된 횟수 : <a id="currentClicked"></a>
+            </div>
     </div>
+</section>
 </body>
 
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
     $(document).ready(
         $("#shortenUrl").submit( function () {
@@ -52,6 +105,15 @@
             return false;
         })
     );
+    function copyUrl(){
+        const obj = document.getElementById("shortendUrl").innerText;
+        const elem = document.createElement("textarea");
+        document.body.appendChild(elem);
+        elem.value = obj;
+        elem.select();
+        document.execCommand("copy");
+        document.body.removeChild(elem);
+    }
 </script>
 
 </html>
